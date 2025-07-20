@@ -7,13 +7,13 @@
     <style>
         /* --- Gumroad Style: Compact and Refined --- */
         :root {
-            --color-background: #f4f4f4; /* Updated to f4f4f4 */
+            --color-background: #f4f4f4;
             --color-container: #ffffff;
             --color-group-bg: #fafafa;
             --color-text-dark: #333333;
             --color-border-light: #e0e0e0;
-            --color-border-focused: #99c7ff;
-            --color-focus-shadow: rgba(0, 115, 230, 0.3);
+            --color-border-focused: #007bff;
+            --color-focus-shadow: rgba(0, 123, 255, 0.25);
             --color-primary: #ff7d00;
             --color-primary-hover: #e67100;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -64,11 +64,11 @@
         }
         legend {
             font-size: 1.1em;
-            font-weight: bold; /* Made font bold */
+            font-weight: bold;
             color: var(--color-text-dark);
             padding: 0 10px;
-            background-color: #ffffff; /* Changed legend background to white */
-            margin-top: -10px; /* Added slight negative margin for tab effect */
+            background-color: #ffffff;
+            margin-top: -10px;
         }
         .form-row {
             display: flex;
@@ -93,10 +93,7 @@
             font-size: 0.95em;
             color: #555;
         }
-        input[type="text"],
-        input[type="date"],
-        input[type="number"],
-        textarea {
+        input {
             width: 100%;
             padding: var(--padding-lg);
             box-sizing: border-box;
@@ -107,14 +104,28 @@
             background-color: var(--color-container);
             transition: none;
         }
-        input:focus, textarea:focus {
+        input:focus {
             outline: none;
             border-color: var(--color-border-focused);
-            box-shadow: 0 0 0 4px var(--color-focus-shadow);
+            box-shadow: 0 0 0 2px var(--color-focus-shadow);
         }
         textarea {
+            width: 100%;
+            padding: var(--padding-lg);
+            box-sizing: border-box;
+            border: 1px solid var(--color-border-light);
+            border-radius: var(--border-radius);
+            margin-top: 4px;
+            font-size: 1em;
+            background-color: var(--color-container);
+            transition: none;
             min-height: 100px;
             resize: vertical;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-border-focused);
+            box-shadow: 0 0 0 2px var(--color-focus-shadow);
         }
         .authority-item {
             border: 1px solid var(--color-border-light);
