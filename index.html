@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Generator</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+        textarea { width: 100%; height: 200px; margin-bottom: 10px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #status { margin-top: 20px; padding: 10px; background-color: #f0f0f0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Generate PDF from JSON</h1>
+    <p>Enter your JSON data below. It will be sent to the API to generate a PDF.</p>
+
+    <textarea id="jsonDataInput">
+{
+  "invoiceNumber": "INV-2025-001",
+  "customerName": "Acme Corp",
+  "invoiceDate": "2025-07-20",
+  "items": [
+    {
+      "description": "Product A",
+      "quantity": 2,
+      "unitPrice": 50.00
+    },
+    {
+      "description": "Service B",
+      "quantity": 1,
+      "unitPrice": 150.00
+    },
+    {
+      "description": "License C",
+      "quantity": 5,
+      "unitPrice": 10.00
+    }
+  ],
+  "total": 350.00
+}
+    </textarea>
+
+    <button id="generateBtn">Generate and Download PDF</button>
+
+    <div id="status"></div>
+
+    <script>
+        const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL'; // <--- REPLACE THIS
+
+        const generateBtn = document.getElementById('generateBtn');
+        const jsonDataInput = document.getElementById('jsonDataInput');
+        const statusDiv = document.getElementById('status');
+
+        generateBtn.addEventListener('click', async () => {
+            statusDiv.textContent = 'Generating PDF... Please wait.';
+            generateBtn.disabled = true;
+
+            try {
+                // 1. Get and parse JSON from the textarea
+                const jsonData = JSON.parse(jsonDataInput.value);
+
+                // 2. Send JSON to the API
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+                
+                // Check if the response is successful
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // 3. Get the JSON response containing the base64 data
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                const base64Data = result.pdfData;
+                const fileName = result.fileName || 'generated_file.pdf';
+
+                // 4. Decode base64 and create a Blob
+                // a. Decode the base64 string to a binary string
+                const binaryString = atob(base64Data);
+                const len = binaryString.length;
+                
+                // b. Create a Uint8Array from the binary string
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // c. Create a Blob with the correct MIME type
+                const pdfBlob = new Blob([bytes], { type: 'application/pdf' });
+
+                // 5. Create a download link and trigger the download
+                const blobUrl = URL.createObjectURL(pdfBlob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = fileName;
+                document.body.appendChild(link); // Append to the body
+                link.click(); // Programmatically click the link
+                document.body.removeChild(link); // Clean up the temporary link
+                URL.revokeObjectURL(blobUrl); // Revoke the object URL to free memory
+
+                statusDiv.textContent = 'PDF generated successfully! It should be downloading now.';
+
+            } catch (error) {
+                statusDiv.textContent = `Error: ${error.message}`;
+                console.error('Error:', error);
+            } finally {
+                generateBtn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
